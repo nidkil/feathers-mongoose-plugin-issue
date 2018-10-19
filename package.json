@@ -1,5 +1,5 @@
 {
-  "name": "mongoose-issue",
+  "name": "feathers-mongoose-plugin-issue",
   "description": "Project to show that feathers is the cause of Mongoose plugin not working correctly.",
   "version": "0.0.0",
   "homepage": "",
