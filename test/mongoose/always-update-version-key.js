@@ -54,136 +54,108 @@ describe('Database Tests', function() {
       expect(doc.__v).to.equal(0);
     });
 
-    it('should update document using findOneAndUpdate', async function () {
-      const postFix = ' findOneAndUpdate';
-      const Categories = mongoose.model('Categories');
-      const test = new Categories(_.cloneDeep(testData));
-      let result = await test.save();
-      let doc = result._doc;
+    describe('common base document', function () {
 
-      expect(doc.name).to.equal(testData.name);
-      expect(doc.description).to.equal(testData.description);
-      expect(doc.order).to.equal(0);
-      expect(doc.__v).to.equal(0);
+      let id = null;
+      let category = null;
 
-      await Categories.findOneAndUpdate(
-        { _id: doc._id },
-        { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
-      result = await Categories.find({ _id: doc._id });
+      before(async function () {
+        const Categories = mongoose.model('Categories');
+        const test = new Categories(_.cloneDeep(testData));
+        let result = await test.save();
+        let doc = result._doc;
 
-      doc = result[0]._doc;
-
-      expect(doc.name).to.equal(testData.name + postFix);
-      expect(doc.description).to.equal(testData.description + postFix);
-      expect(doc.order).to.equal(1);
-      expect(doc.__v).to.equal(1);
-    });
-
-    it('should update using findByIdAndUpdate', async () => {
-      const postFix = ' findByIdAndUpdate';
-      const Categories = mongoose.model('Categories');
-      const test = new Categories(_.cloneDeep(testData));
-      let result = await test.save();
-      let doc = result._doc;
-
-      expect(doc.name).to.equal(testData.name);
-      expect(doc.description).to.equal(testData.description);
-      expect(doc.order).to.equal(0);
-      expect(doc.__v).to.equal(0);
-
-      const patchTestData = {
-        name: testData.name + postFix,
-        description: testData.description + postFix,
-        order: 1
-      };
-
-      result = await Categories.findByIdAndUpdate(doc._id, {
-        $set: patchTestData
-      }, {
-        new: true
+        id = result._doc._id;
+        category = result._doc
       });
 
-      doc = result._doc;
+      it('should update document using findOneAndUpdate', async function () {
+        const postFix = ' findOneAndUpdate';
+        const Categories = mongoose.model('Categories');
+        await Categories.findOneAndUpdate(
+          { _id: id },
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+        const result = await Categories.find({ _id: id });
+        const doc = result[0]._doc;
 
-      expect(doc.name).to.equal(testData.name + postFix);
-      expect(doc.description).to.equal(testData.description + postFix);
-      expect(doc.order).to.equal(1);
-      expect(doc.__v).to.equal(1);
-    });
+        expect(doc.name).to.equal(testData.name + postFix);
+        expect(doc.description).to.equal(testData.description + postFix);
+        expect(doc.order).to.equal(1);
+        expect(doc.__v).to.equal(1);
+      });
 
-    it('should update document using update', async () => {
-      const postFix = ' update';
-      const Categories = mongoose.model('Categories');
-      const test = new Categories(_.cloneDeep(testData));
-      let result = await test.save();
-      let doc = result._doc;
+      it('should update using findByIdAndUpdate', async () => {
+        const postFix = ' findByIdAndUpdate';
+        const Categories = mongoose.model('Categories');
+        const patchTestData = {
+          name: testData.name + postFix,
+          description: testData.description + postFix,
+          order: 1
+        };
+        const result = await Categories.findByIdAndUpdate(id, {
+          $set: patchTestData
+        }, {
+          new: true
+        });
+        const doc = result._doc;
 
-      expect(doc.name).to.equal(testData.name);
-      expect(doc.description).to.equal(testData.description);
-      expect(doc.order).to.equal(0);
-      expect(doc.__v).to.equal(0);
+        expect(doc.name).to.equal(testData.name + postFix);
+        expect(doc.description).to.equal(testData.description + postFix);
+        expect(doc.order).to.equal(1);
+        expect(doc.__v).to.equal(2);
+      });
 
-      await Categories.update(
-        { _id: doc._id },
-        { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+      it('should update document using update', async () => {
+        const postFix = ' update';
+        const Categories = mongoose.model('Categories');
 
-      result = await Categories.findById(doc._id);
-      doc = result._doc;
+        await Categories.update(
+          { _id: id },
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
 
-      expect(doc.name).to.equal(testData.name + postFix);
-      expect(doc.description).to.equal(testData.description + postFix);
-      expect(doc.order).to.equal(1);
-      expect(doc.__v).to.equal(1);
-    });
+        const result = await Categories.findById(id);
+        const doc = result._doc;
 
-    it('should update document using updateMany', async () => {
-      const postFix = ' findOneAndUpdate';
-      const Categories = mongoose.model('Categories');
-      const test = new Categories(_.cloneDeep(testData));
-      let result = await test.save();
-      let doc = result._doc;
+        expect(doc.name).to.equal(testData.name + postFix);
+        expect(doc.description).to.equal(testData.description + postFix);
+        expect(doc.order).to.equal(1);
+        expect(doc.__v).to.equal(3);
+      });
 
-      expect(doc.name).to.equal(testData.name);
-      expect(doc.description).to.equal(testData.description);
-      expect(doc.order).to.equal(0);
-      expect(doc.__v).to.equal(0);
+      it('should update document using updateMany', async () => {
+        const postFix = ' findOneAndUpdate';
+        const Categories = mongoose.model('Categories');
 
-      await Categories.updateMany(
-        { _id: doc._id },
-        { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+        await Categories.updateMany(
+          { _id: id },
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
 
-      result = await Categories.findById(doc._id);
-      doc = result._doc;
+        const result = await Categories.findById(id);
+        const doc = result._doc;
 
-      expect(doc.name).to.equal(testData.name + postFix);
-      expect(doc.description).to.equal(testData.description + postFix);
-      expect(doc.order).to.equal(1);
-      expect(doc.__v).to.equal(1);
-    });
+        expect(doc.name).to.equal(testData.name + postFix);
+        expect(doc.description).to.equal(testData.description + postFix);
+        expect(doc.order).to.equal(1);
+        expect(doc.__v).to.equal(4);
+      });
 
-    it('should update document using updateOne', async () => {
-      const postFix = ' findOneAndUpdate';
-      const Categories = mongoose.model('Categories');
-      const test = new Categories(_.cloneDeep(testData));
-      let result = await test.save();
-      let doc = result._doc;
+      it('should update document using updateOne', async () => {
+        const postFix = ' findOneAndUpdate';
+        const Categories = mongoose.model('Categories');
 
-      expect(doc.name).to.equal(testData.name);
-      expect(doc.description).to.equal(testData.description);
-      expect(doc.order).to.equal(0);
-      expect(doc.__v).to.equal(0);
+        await Categories.updateOne(
+          { _id: id },
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
 
-      await Categories.updateOne(
-        { _id: doc._id },
-        { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+        const result = await Categories.findById(id);
+        const doc = result._doc;
 
-      result = await Categories.findById(doc._id);
-      doc = result._doc;
+        expect(doc.name).to.equal(testData.name + postFix);
+        expect(doc.description).to.equal(testData.description + postFix);
+        expect(doc.order).to.equal(1);
+        expect(doc.__v).to.equal(5);
+      });
 
-      expect(doc.name).to.equal(testData.name + postFix);
-      expect(doc.description).to.equal(testData.description + postFix);
-      expect(doc.order).to.equal(1);
-      expect(doc.__v).to.equal(1);
     });
 
   });

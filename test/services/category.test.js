@@ -49,87 +49,72 @@ describe('\'category\' service', () => {
     }
   });
 
-  it('runs find', async function () {
-    let result = await handlePromise(app.service('category').create(_.cloneDeep(testData)));
+  describe('common base document', function () {
 
-    if (!result.success) throw result.err;
+    let id = null;
+    let category = null;
 
-    const category = result.payload;
+    before(async function () {
+      let result = await handlePromise(app.service('category').create(_.cloneDeep(testData)));
 
-    expect(category.name).to.equal(testData.name);
-    expect(category.description).to.equal(testData.description);
-    expect(category.order).to.equal(0);
-    expect(category.__v).to.equal(0);
+      if (!result.success) throw result.err;
 
-    result = await handlePromise(app.service('category').find({}));
-
-    if (!result.success) throw result.err;
-
-    const payload = result.payload;
-
-    expect(payload.total).to.be.at.least(1);
-  });
-
-  it('runs update', async function() {
-    const postFix = ' update';
-    let result = await handlePromise(app.service('category').create(_.cloneDeep(testData)));
-
-    if (!result.success) throw result.err;
-
-    const category = result.payload;
-
-    expect(category.name).to.equal(testData.name);
-    expect(category.description).to.equal(testData.description);
-    expect(category.order).to.equal(0);
-    expect(category.__v).to.equal(0);
-
-    let updatedTestData = _.merge(_.cloneDeep(category), {
-      name: category.name + postFix,
-      description: category.description + postFix,
-      order: category.order + 1
+      id = result.payload._id;
     });
 
-    result = await handlePromise(app.service('category').update(category._id, updatedTestData));
+    it('runs find', async function () {
+      const result = await handlePromise(app.service('category').find({ _id: id }));
 
-    if (!result.success) throw result.err;
+      if (!result.success) throw result.err;
 
-    const updatedCategory = result.payload;
+      const payload = result.payload;
 
-    expect(updatedCategory.name).to.equal(testData.name + postFix);
-    expect(updatedCategory.description).to.equal(testData.description + postFix);
-    expect(updatedCategory.order).to.equal(1);
-    expect(updatedCategory.__v).to.equal(1);
-  });
+      expect(payload.total).to.be.at.least(1);
 
-  it('runs patch', async function() {
-    const postFix = ' patch';
-    let result = await handlePromise(app.service('category').create(_.cloneDeep(testData)));
+      category = payload.data[payload.data.length - 1];
+    });
 
-    if (!result.success) throw result.err;
+    it('runs update', async function() {
+      const postFix = ' update';
+      let updatedTestData = _.merge(_.cloneDeep(category), {
+        name: category.name + postFix,
+        description: category.description + postFix,
+        order: category.order + 1
+      });
 
-    const category = result.payload;
+      const result = await handlePromise(app.service('category').update(category._id, updatedTestData));
 
-    expect(category.name).to.equal(testData.name);
-    expect(category.description).to.equal(testData.description);
-    expect(category.order).to.equal(0);
-    expect(category.__v).to.equal(0);
+      if (!result.success) throw result.err;
 
-    let patchTestData = {
-      name: category.name + postFix,
-      description: category.description + postFix,
-      order: category.order + 1
-    };
+      const updatedCategory = result.payload;
 
-    result = await handlePromise(app.service('category').patch(category._id, patchTestData));
+      expect(updatedCategory.name).to.equal(testData.name + postFix);
+      expect(updatedCategory.description).to.equal(testData.description + postFix);
+      expect(updatedCategory.order).to.equal(1);
+      expect(updatedCategory.__v).to.equal(1);
+    });
 
-    if (!result.success) throw result.err;
+    it('runs patch', async function() {
+      const postFix = ' patch';
+      let patchTestData = {
+        name: category.name + postFix,
+        description: category.description + postFix,
+        order: category.order + 1
+      };
 
-    const patchedCategory = result.payload;
+      const result = await handlePromise(app.service('category').patch(category._id, patchTestData));
 
-    expect(patchedCategory.name).to.equal(testData.name + postFix);
-    expect(patchedCategory.description).to.equal(testData.description + postFix);
-    expect(patchedCategory.order).to.equal(1);
-    expect(patchedCategory.__v).to.equal(1);
+      if (!result.success) throw result.err;
+
+      const patchedCategory = result.payload;
+
+      expect(patchedCategory.name).to.equal(testData.name + postFix);
+      expect(patchedCategory.description).to.equal(testData.description + postFix);
+      expect(patchedCategory.order).to.equal(1);
+      // When the update works this test will fail, because __v will have the value 1 already
+      expect(patchedCategory.__v).to.equal(1);
+    });
+
   });
 
 });
