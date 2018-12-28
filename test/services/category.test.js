@@ -39,7 +39,7 @@ describe('\'category\' service', () => {
   it('runs create', async function () {
     const result = await handlePromise(app.service('category').create(_.cloneDeep(testData)));
     if (result.success) {
-      const category = result.payload;
+      const category = result.payload._doc;
       expect(category._id).to.be.a('object');
       expect(category).to.have.any.keys('name', 'description');
       expect(category.name).to.equal('Name');
