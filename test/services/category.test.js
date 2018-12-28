@@ -76,13 +76,13 @@ describe('\'category\' service', () => {
 
     it('runs update', async function() {
       const postFix = ' update';
-      let updatedTestData = _.merge(_.cloneDeep(category), {
+      let updatedTestData = _.merge(_.cloneDeep(category._doc), {
         name: category.name + postFix,
         description: category.description + postFix,
         order: category.order + 1
       });
 
-      const result = await handlePromise(app.service('category').update(category._id, updatedTestData));
+      const result = await handlePromise(app.service('category').update(category._id, updatedTestData._id));
 
       if (!result.success) throw result.err;
 

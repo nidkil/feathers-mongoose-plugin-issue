@@ -4,6 +4,10 @@
 function updateVersionKey () {
   const update = this.getUpdate();
 
+  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++ src/mongoose/always-update-version-key.js START');
+  console.log('this.getUpdate()', update);
+  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+
   if (update.__v != null) {
     delete update.__v;
   }
@@ -20,6 +24,9 @@ function updateVersionKey () {
   }
   update.$inc = update.$inc || {};
   update.$inc.__v = 1;
+  console.log('------------------------------------------------------- src/mongoose/always-update-version-key.js END');
+  console.log('this.getUpdate()', update);
+  console.log('-----------------------------------------------------------------------------------------------------');
 }
 
 module.exports =  function (schema) {
