@@ -6,6 +6,44 @@
 
 This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
 
+## Hack
+
+The following line of `node_modules/feathers-mongoose/lib/service.js` need to be replaced:
+
+  ```js
+  let modelQuery = model.findOneAndUpdate(_.omit(query, '$populate'), data, options); 
+  ``` 
+
+With:
+
+  ```js 
+  // HACK --- START
+  const hackedData = Object.assign({}, data, { $set: {} });
+  console.log('***************************************************************** feathers-mongoose/lib/service.js ');
+  console.log('query', _.omit(query, '$populate'));
+  console.log('data', hackedData);
+  console.log('options', options);
+  console.log('***************************************************************************************************');
+  let modelQuery = model.findOneAndUpdate(_.omit(query, '$populate'), hackedData, options);
+  // HACK --- END
+  ``` 
+
+In addition the following connection options need to be passed to Mongoose in `src/mongoose.js`:
+
+  ```js 
+  const mongooseOptions = {
+    useFindAndModify: false,
+    useCreateIndex: true,
+    useNewUrlParser: true
+  };
+  ``` 
+
+And set on the connection:
+
+  ```js
+  mongoose.connect(app.get('mongodb'), mongooseOptions); 
+  ``` 
+
 ## Getting Started
 
 Getting up and running is as easy as 1, 2, 3.
