@@ -10,7 +10,8 @@ module.exports = function (app) {
   const options = {
     Model,
     paginate,
-    lean: false
+    lean: false,
+    runValidators: true
   };
 
   // Initialize our service with any options it requires
