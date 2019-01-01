@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 const { expect } = require('chai');
 const mongoose = require('mongoose');
 const app = require('../../src/app');
-const { handlePromise } = require('../helpers.js');
+const { handlePromise } = require('../helpers');
 const _ = require('lodash');
 
 const testData = {
@@ -82,7 +83,7 @@ describe('\'category\' service', () => {
         order: category.order + 1
       });
 
-      const result = await handlePromise(app.service('category').update(category._id, updatedTestData._id));
+      const result = await handlePromise(app.service('category').update(category._id, updatedTestData));
 
       if (!result.success) throw result.err;
 
@@ -111,8 +112,7 @@ describe('\'category\' service', () => {
       expect(patchedCategory.name).to.equal(testData.name + postFix);
       expect(patchedCategory.description).to.equal(testData.description + postFix);
       expect(patchedCategory.order).to.equal(1);
-      // When the update works this test will fail, because __v will have the value 1 already
-      expect(patchedCategory.__v).to.equal(1);
+      expect(patchedCategory.__v).to.equal(2);
     });
 
   });
