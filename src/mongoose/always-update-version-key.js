@@ -2,11 +2,7 @@
 // will not update the version key. This plugin provides a workaround to always update the version key.
 
 function updateVersionKey () {
-  const update = this.getUpdate();
-
-  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++ src/mongoose/always-update-version-key.js START');
-  console.log('this.getUpdate()', update);
-  console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+  let update = this.getUpdate();
 
   if (update.__v != null) {
     delete update.__v;
@@ -24,9 +20,20 @@ function updateVersionKey () {
   }
   update.$inc = update.$inc || {};
   update.$inc.__v = 1;
-  console.log('------------------------------------------------------- src/mongoose/always-update-version-key.js END');
-  console.log('this.getUpdate()', update);
-  console.log('-----------------------------------------------------------------------------------------------------');
+
+  if (update.$set) {
+    Object.keys(update).forEach(key => {
+      if (!key.startsWith('$')) {
+        if (key !== 'version2') {
+          update.$set[key] = update[key];
+        }
+        delete update[key];
+      }
+    });
+  }
+  console.log('******************************************************** src/mongoose/always-update-version-key.js ');
+  console.log('update', update);
+  console.log('***************************************************************************************************');
 }
 
 module.exports =  function (schema) {
