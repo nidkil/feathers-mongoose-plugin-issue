@@ -6,7 +6,7 @@ const { Schema } = require ('mongoose');
 const alwaysUpdateVersionKey = require('../../mongoose/always-update-version-key');
 
 module.exports = function () {
-  const schemaVersion = '1.0';
+  const schemaVersion = 1.1;
   const categoriesSchema = new Schema({
     name: { type: String, i18n: true, required: true },
     description: { type: String, i18n: true, required: true },
@@ -18,7 +18,7 @@ module.exports = function () {
     deleted: { type: Boolean, default: false },
     createdBy: { type: Schema.Types.ObjectId, ref: 'users', required: true },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'users', required: true },
-    version: { type: Schema.Types.Decimal128, required: true, default: schemaVersion }
+    version: { type: Number, required: true, default: schemaVersion }
   }, {
     timestamps: true
   });
