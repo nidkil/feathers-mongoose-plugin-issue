@@ -1,9 +1,12 @@
+/* eslint-disable no-console */
 const mongoose = require('mongoose');
 const { expect } = require('chai');
 const _ = require('lodash');
 const categoriesSchema = require('../../src/models/schemas/categories.schema')();
 
 const mongooseOptions = {
+  useFindAndModify: false,
+  useCreateIndex: true,
   useNewUrlParser: true
 };
 
@@ -58,15 +61,23 @@ describe('Database Tests', function() {
 
       let id = null;
       let category = null;
+      // Return Plain JavaScript Objects (PJOs) instead of MongooseDocuments
+      const lean = true;
+      const options = {
+        lean
+      };
 
       before(async function () {
         const Categories = mongoose.model('Categories');
         const test = new Categories(_.cloneDeep(testData));
         let result = await test.save();
-        let doc = result._doc;
+        category = result._doc;
+        id = category._id;
+      });
 
-        id = result._doc._id;
-        category = result._doc
+      after(async function () {
+        const Categories = mongoose.model('Categories');
+        await Categories.findByIdAndDelete(id);
       });
 
       it('should update document using findOneAndUpdate', async function () {
@@ -74,7 +85,9 @@ describe('Database Tests', function() {
         const Categories = mongoose.model('Categories');
         await Categories.findOneAndUpdate(
           { _id: id },
-          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 },
+          options
+        );
         const result = await Categories.find({ _id: id });
         const doc = result[0]._doc;
 
@@ -92,12 +105,12 @@ describe('Database Tests', function() {
           description: testData.description + postFix,
           order: 1
         };
-        const result = await Categories.findByIdAndUpdate(id, {
-          $set: patchTestData
-        }, {
-          new: true
-        });
-        const doc = result._doc;
+        const result = await Categories.findByIdAndUpdate(
+          id,
+          { $set: patchTestData },
+          Object.assign({}, { new: true }, options)
+        );
+        const doc = lean ? result : result._doc;
 
         expect(doc.name).to.equal(testData.name + postFix);
         expect(doc.description).to.equal(testData.description + postFix);
@@ -111,7 +124,9 @@ describe('Database Tests', function() {
 
         await Categories.update(
           { _id: id },
-          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 },
+          options
+        );
 
         const result = await Categories.findById(id);
         const doc = result._doc;
@@ -145,7 +160,9 @@ describe('Database Tests', function() {
 
         await Categories.updateOne(
           { _id: id },
-          { name: testData.name + postFix, description: testData.description + postFix, order: 1 });
+          { name: testData.name + postFix, description: testData.description + postFix, order: 1 },
+          options
+        );
 
         const result = await Categories.findById(id);
         const doc = result._doc;
