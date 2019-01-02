@@ -8,6 +8,9 @@
   },
   "mongodb": {
     "connection": "mongodb://localhost:27017/mongoose_issue",
-    "debug": true
+    "debug": {
+      "enabled": true,
+      "compact": false
+    }
   }
 }
