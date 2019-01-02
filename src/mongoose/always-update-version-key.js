@@ -21,16 +21,18 @@ function updateVersionKey () {
   update.$inc = update.$inc || {};
   update.$inc.__v = 1;
 
+  // HACK --- START
+  // If the $set field is defined, move all fields to it, this is needed for this plugin to work in combination with
+  // Feathers
   if (update.$set) {
     Object.keys(update).forEach(key => {
       if (!key.startsWith('$')) {
-        if (key !== 'version2') {
-          update.$set[key] = update[key];
-        }
+        update.$set[key] = update[key];
         delete update[key];
       }
     });
   }
+  // HACK --- END
   console.log('******************************************************** src/mongoose/always-update-version-key.js ');
   console.log('update', update);
   console.log('***************************************************************************************************');
